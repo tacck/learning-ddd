@@ -165,6 +165,8 @@ return [
         /*
          * Package Service Providers...
          */
+        App\Providers\ScreeningServiceProvider::class,
+        App\Providers\InterviewServiceProvider::class,
 
         /*
          * Application Service Providers...

@@ -4,6 +4,7 @@ namespace Tests\Unit\SampleDdd\ApplicationService;
 
 use App\Interview;
 use App\Screening;
+use App\ScreeningEloquentRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use SampleDdd\ApplicationService\ScreeningApplicationService;
@@ -14,15 +15,22 @@ class ScreeningApplicationServiceTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** @var ScreeningApplicationService */
+    private $service;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->service = new ScreeningApplicationService(new ScreeningEloquentRepository());
+    }
+
     /**
      * @throws \Exception
      */
     public function testApply_応募者登録_正常()
     {
-        $service = new ScreeningApplicationService();
-
         $expected = 'testing@example.com';
-        $service->apply($expected);
+        $this->service->apply($expected);
 
         $screening = Screening::where('applicant_email_address', $expected)->get();
         $this->assertSame(1, count($screening));
@@ -34,28 +42,22 @@ class ScreeningApplicationServiceTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $service = new ScreeningApplicationService();
-
         $expected = '';
-        $service->apply($expected);
+        $this->service->apply($expected);
     }
 
     public function testApply_応募者登録_メールアドレス不正_null()
     {
         $this->expectException(\TypeError::class);
 
-        $service = new ScreeningApplicationService();
-
         $expected = null;
-        $service->apply($expected);
+        $this->service->apply($expected);
     }
 
     public function testApply_面談から新規候補者を登録_正常()
     {
-        $service = new ScreeningApplicationService();
-
         $expected = 'testing@example.com';
-        $service->startFromPreInterview($expected);
+        $this->service->startFromPreInterview($expected);
 
         $screening = Screening::where('applicant_email_address', $expected)->get();
         $this->assertSame(1, count($screening));
@@ -67,35 +69,29 @@ class ScreeningApplicationServiceTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $service = new ScreeningApplicationService();
-
         $expected = '';
-        $service->startFromPreInterview($expected);
+        $this->service->startFromPreInterview($expected);
     }
 
     public function testApply_面談から新規候補者を登録_メールアドレス不正_null()
     {
         $this->expectException(\TypeError::class);
 
-        $service = new ScreeningApplicationService();
-
         $expected = null;
-        $service->startFromPreInterview($expected);
+        $this->service->startFromPreInterview($expected);
     }
 
     public function testApply_次の面接を設定_正常()
     {
-        $service = new ScreeningApplicationService();
-
         // 応募で登録
         $expected = 'testing@example.com';
-        $service->apply($expected);
+        $this->service->apply($expected);
         // 登録した情報からID取得して面接の設定に進む
         $screening = Screening::where('applicant_email_address', $expected)->get();
         $screeningId = $screening[0]->id;
 
         $interviewDate = new \DateTime();
-        $service->addNextInterview($screeningId, $interviewDate);
+        $this->service->addNextInterview($screeningId, $interviewDate);
 
         $interview = Interview::where('screening_id', $screeningId)->get();
 

@@ -15,6 +15,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/screening/preInterview', 'ScreeningController@preInterview');
+
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
