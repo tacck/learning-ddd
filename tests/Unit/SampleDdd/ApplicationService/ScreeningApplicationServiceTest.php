@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use SampleDdd\ApplicationService\ScreeningApplicationService;
 use SampleDdd\Domain\ScreeningStatus;
+use SampleDdd\Domain\EmailAddress;
 use Tests\TestCase;
 
 class ScreeningApplicationServiceTest extends TestCase
@@ -30,7 +31,7 @@ class ScreeningApplicationServiceTest extends TestCase
     public function testApply_応募者登録_正常()
     {
         $expected = 'testing@example.com';
-        $this->service->apply($expected);
+        $this->service->apply(EmailAddress::reconstruct($expected));
 
         $screening = Screening::where('applicant_email_address', $expected)->get();
         $this->assertSame(1, count($screening));
@@ -43,7 +44,7 @@ class ScreeningApplicationServiceTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $expected = '';
-        $this->service->apply($expected);
+        $this->service->apply(EmailAddress::reconstruct($expected));
     }
 
     public function testApply_応募者登録_メールアドレス不正_null()
@@ -51,13 +52,13 @@ class ScreeningApplicationServiceTest extends TestCase
         $this->expectException(\TypeError::class);
 
         $expected = null;
-        $this->service->apply($expected);
+        $this->service->apply(EmailAddress::reconstruct($expected));
     }
 
     public function testApply_面談から新規候補者を登録_正常()
     {
         $expected = 'testing@example.com';
-        $this->service->startFromPreInterview($expected);
+        $this->service->startFromPreInterview(EmailAddress::reconstruct($expected));
 
         $screening = Screening::where('applicant_email_address', $expected)->get();
         $this->assertSame(1, count($screening));
@@ -70,7 +71,7 @@ class ScreeningApplicationServiceTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $expected = '';
-        $this->service->startFromPreInterview($expected);
+        $this->service->startFromPreInterview(EmailAddress::reconstruct($expected));
     }
 
     public function testApply_面談から新規候補者を登録_メールアドレス不正_null()
@@ -85,7 +86,7 @@ class ScreeningApplicationServiceTest extends TestCase
     {
         // 応募で登録
         $expected = 'testing@example.com';
-        $this->service->apply($expected);
+        $this->service->apply(EmailAddress::reconstruct($expected));
         // 登録した情報からID取得して面接の設定に進む
         $screening = Screening::where('applicant_email_address', $expected)->get();
         $screeningId = $screening[0]->id;

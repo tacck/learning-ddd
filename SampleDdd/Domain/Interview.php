@@ -23,7 +23,7 @@ class Interview
     private $recruiterId;
 
     /**
-     * コンストラクタをプライベートにしてファクトリーメソッド経由での作成に強制
+     * Interview constructor.
      */
     private function __construct()
     {
@@ -32,23 +32,38 @@ class Interview
     /**
      * オブジェクト作成用ファクトリーメソッド
      *
-     * @param int|null $interviewId
      * @param int $screeningId
      * @param \DateTime $interviewDate
      * @param int $interviewNumber
      * @return Interview
      */
-    public static function create(?int $interviewId, int $screeningId, \DateTime $interviewDate, int $interviewNumber): Interview
+    public static function create(int $screeningId, \DateTime $interviewDate, int $interviewNumber): Interview
     {
         $object = new Interview();
 
-        $object->interviewId = $interviewId;
+        $object->interviewId = null;
         $object->screeningId = $screeningId;
         $object->screeningDate = $interviewDate;
         $object->interviewNumber = $interviewNumber;
         $object->screeningStepResult = ScreeningStepResult::NotEvaluated(); // TODO: 選考過程仮登録
         $object->recruiterId = 1; // TODO: 担当者仮登録
 
+        return $object;
+    }
+
+    /**
+     * Repository からの再構成用メソッド
+     *
+     * @param int $interviewId
+     * @param int $screeningId
+     * @param \DateTime $interviewDate
+     * @param int $interviewNumber
+     * @return self
+     */
+    public static function reconstruct(int $interviewId, int $screeningId, \DateTime $interviewDate, int $interviewNumber): self
+    {
+        $object = self::create($screeningId, $interviewDate, $interviewNumber);
+        $object->interviewId = $interviewId;
         return $object;
     }
 

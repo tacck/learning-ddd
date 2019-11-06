@@ -6,6 +6,7 @@ namespace SampleDdd\ApplicationService;
 use Illuminate\Support\Facades\DB;
 use SampleDdd\Domain\Repository\ScreeningRepository;
 use SampleDdd\Domain\Screening;
+use SampleDdd\Domain\EmailAddress;
 
 class ScreeningApplicationService
 {
@@ -23,9 +24,9 @@ class ScreeningApplicationService
     /**
      * 面談から新規候補者を登録する
      *
-     * @param string $applicantEmailAddress
+     * @param EmailAddress $applicantEmailAddress
      */
-    public function startFromPreInterview(string $applicantEmailAddress): void
+    public function startFromPreInterview(EmailAddress $applicantEmailAddress): void
     {
         DB::transaction(function () use ($applicantEmailAddress) {
             /** @var \SampleDdd\Domain\Screening $screening */
@@ -38,9 +39,9 @@ class ScreeningApplicationService
     /**
      * 新規応募者を登録する
      *
-     * @param string $applicantEmailAddress
+     * @param EmailAddress $applicantEmailAddress
      */
-    public function apply(string $applicantEmailAddress): void
+    public function apply(EmailAddress $applicantEmailAddress): void
     {
         DB::transaction(function () use ($applicantEmailAddress) {
             /** @var \SampleDdd\Domain\Screening $screening */

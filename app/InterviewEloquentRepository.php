@@ -12,7 +12,7 @@ class InterviewEloquentRepository implements InterviewRepository
     public function findById(int $interviewId): Interview
     {
         $interviewModel = \App\Interview::find($interviewId);
-        $interview = Interview::create($interviewModel->interview_id, $interviewModel->screening_id, $interviewModel->interview_number, $interviewModel->interview_date);
+        $interview = Interview::reconstruct($interviewModel->interview_id, $interviewModel->screening_id, $interviewModel->interview_number, $interviewModel->interview_date);
         return $interview;
     }
 
@@ -22,7 +22,7 @@ class InterviewEloquentRepository implements InterviewRepository
         $interviews = [];
 
         foreach ($interviewModels as $interviewModel) {
-            $interviews[] =Interview::create($interviewModel->interview_id, $interviewModel->screening_id, $interviewModel->interview_number, $interviewModel->interview_date);
+            $interviews[] = Interview::reconstruct($interviewModel->interview_id, $interviewModel->screening_id, $interviewModel->interview_number, $interviewModel->interview_date);
         }
 
         return $interviews;
