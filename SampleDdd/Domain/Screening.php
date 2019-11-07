@@ -4,7 +4,7 @@ namespace SampleDdd\Domain;
 
 use Exception;
 
-class Screening extends EmailAddress
+class Screening
 {
     /** @var ScreeningId 採用選考ID */
     private $id;
