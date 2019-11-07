@@ -40,6 +40,18 @@ class ScreeningApplicationServiceTest extends TestCase
         $this->assertSame(ScreeningStatus::Interview()->getValue(), $screening[0]->status);
     }
 
+    public function testApply_応募者登録後次のステップへ_正常()
+    {
+        $expected = 'testing@example.com';
+        $this->service->apply(EmailAddress::reconstruct($expected));
+
+        $screening = Screening::where('applicant_email_address', $expected)->get();
+        $this->service->stepToNext(new ScreeningId($screening[0]->id));
+
+        $screeningUpdated = Screening::where('applicant_email_address', $expected)->get();
+        $this->assertSame(ScreeningStatus::Offered()->getValue(), $screeningUpdated[0]->status);
+    }
+
     public function testApply_応募者登録_メールアドレス不正_空文字()
     {
         $this->expectException(\InvalidArgumentException::class);

@@ -94,6 +94,17 @@ class Screening
     }
 
     /**
+     * 次のステップへ進む
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function stepToNext(): void
+    {
+        // 状態遷移は ScreeningStatus の責務なのでただ呼び出すだけ。
+        $this->status = $this->status->nextStep();
+    }
+
+    /**
      * Repository からの再構成用メソッド
      *
      * @param int $screeningId

@@ -70,5 +70,22 @@ class ScreeningApplicationService
         });
     }
 
-    // 面談から面接に進む処理は省略
+    /**
+     * 採用選考を次のステップに進める
+     *
+     * @param ScreeningId $screeningId
+     */
+    public function stepToNext(ScreeningId $screeningId): void
+    {
+        DB::transaction(function () use ($screeningId) {
+            // Screeningクラスの「次のステップに進める」というメソッドを呼び、
+            // 永続化するだけ
+
+            /** @var Screening $screening */
+            $screening = $this->screeningRepository->findById($screeningId);
+
+            $screening->stepToNext();
+            $this->screeningRepository->update($screening);
+        });
+    }
 }

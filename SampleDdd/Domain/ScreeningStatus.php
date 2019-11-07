@@ -46,6 +46,7 @@ class ScreeningStatus
      *
      * @param string $value
      * @throws \ReflectionException
+     * @throws \InvalidArgumentException
      */
     public function __construct(string $value)
     {
@@ -65,6 +66,7 @@ class ScreeningStatus
      * @param $value
      * @param $arguments
      * @return static
+     * @throws \ReflectionException
      */
     public static function __callStatic($value, $arguments): self
     {
@@ -101,6 +103,96 @@ class ScreeningStatus
     {
         $statuses = self::toArray();
         return $statuses[self::$value];
+    }
+
+    /**
+     * 次のステップのステータスを取得
+     *
+     * @return $this
+     * @throws \InvalidArgumentException
+     */
+    public function nextStep(): self
+    {
+        switch ($this->getValue()) {
+            case self::NotApplied():
+                return self::DocumentScreening();
+            case self::DocumentScreening():
+                return self::Interview();
+            case self::Interview():
+                return self::Offered();
+            case self::Offered():
+                return self::Entered();
+            default:
+                throw new \InvalidArgumentException('許可されていない状態遷移です。');
+        }
+    }
+
+    /**
+     * 「戻る」した時のステータスを取得する
+     *
+     * @return $this
+     * @throws \InvalidArgumentException
+     */
+    public function previousStep(): self
+    {
+        switch ($this->getValue()) {
+            case self::DocumentScreeningRejected():
+                return self::DocumentScreening();
+            case self::DocumentScreeningDeclined():
+                return self::DocumentScreening();
+            case self::Interview():
+                return self::DocumentScreening();
+            case self::InterviewRejected():
+                return self::Interview();
+            case self::InterviewDeclined():
+                return self::Interview();
+            case self::Offered():
+                return self::Interview();
+            case self::OfferDeclined():
+                return self::Offered();
+            case self::Entered():
+                return self::Offered();
+            default:
+                throw new \InvalidArgumentException('許可されていない状態遷移です。');
+        }
+    }
+
+    /**
+     * 「不合格」した時のステータスを取得する
+     *
+     * @return $this
+     * @throws \InvalidArgumentException
+     */
+    public function rejectStep(): self
+    {
+        switch ($this->getValue()) {
+            case self::DocumentScreening():
+                return self::DocumentScreeningRejected();
+            case self::Interview():
+                return self::InterviewRejected();
+            default:
+                throw new \InvalidArgumentException('許可されていない状態遷移です。');
+        }
+    }
+
+    /**
+     * 「辞退」した時のステータスを取得する
+     *
+     * @return $this
+     * @throws \InvalidArgumentException
+     */
+    public function declineStep(): self
+    {
+        switch ($this->getValue()) {
+            case self::DocumentScreening():
+                return self::DocumentScreeningDeclined();
+            case self::Interview():
+                return self::InterviewDeclined();
+            case self::Offered():
+                return self::OfferDeclined();
+            default:
+                throw new \InvalidArgumentException('許可されていない状態遷移です。');
+        }
     }
 
     /**
