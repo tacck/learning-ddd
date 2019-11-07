@@ -8,6 +8,7 @@ use App\ScreeningEloquentRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use SampleDdd\ApplicationService\ScreeningApplicationService;
+use SampleDdd\Domain\ScreeningId;
 use SampleDdd\Domain\ScreeningStatus;
 use SampleDdd\Domain\EmailAddress;
 use Tests\TestCase;
@@ -89,12 +90,12 @@ class ScreeningApplicationServiceTest extends TestCase
         $this->service->apply(EmailAddress::reconstruct($expected));
         // 登録した情報からID取得して面接の設定に進む
         $screening = Screening::where('applicant_email_address', $expected)->get();
-        $screeningId = $screening[0]->id;
+        $screeningId = new ScreeningId($screening[0]->id);
 
         $interviewDate = new \DateTime();
         $this->service->addNextInterview($screeningId, $interviewDate);
 
-        $interview = Interview::where('screening_id', $screeningId)->get();
+        $interview = Interview::where('screening_id', $screeningId->getValue())->get();
 
         $this->assertSame(1, count($interview));
         $this->assertEquals(1, $interview[0]->interview_number);

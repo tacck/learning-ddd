@@ -9,21 +9,34 @@ class Interviews
     /** @var array $interviews */
     private $interviews = [];
 
+    /**
+     * Interviews constructor.
+     */
     public function __construct()
     {
         $this->interviews = [];
     }
 
-    public function addNextInterview(int $interviewId, \DateTime $interviewDate)
+    /**
+     * @param ScreeningId $interviewId
+     * @param \DateTime $interviewDate
+     */
+    public function addNextInterview(ScreeningId $interviewId, \DateTime $interviewDate)
     {
         $this->interviews[] = Interview::create($interviewId, $interviewDate, $this->getNextInterviewNumber());
     }
 
+    /**
+     * @return int
+     */
     public function getNextInterviewNumber(): int
     {
         return count($this->interviews) + 1;
     }
 
+    /**
+     * @return array
+     */
     public function getValue(): array
     {
         return $this->interviews;

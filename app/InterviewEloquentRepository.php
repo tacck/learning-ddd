@@ -5,10 +5,15 @@ namespace App;
 
 use SampleDdd\Domain\Interview;
 use SampleDdd\Domain\Repository\InterviewRepository;
+use SampleDdd\Domain\ScreeningId;
 
 class InterviewEloquentRepository implements InterviewRepository
 {
 
+    /**
+     * @param int $interviewId
+     * @return Interview
+     */
     public function findById(int $interviewId): Interview
     {
         $interviewModel = \App\Interview::find($interviewId);
@@ -16,9 +21,13 @@ class InterviewEloquentRepository implements InterviewRepository
         return $interview;
     }
 
-    public function findByScreeningId(int $screeningId): array
+    /**
+     * @param ScreeningId $screeningId
+     * @return array
+     */
+    public function findByScreeningId(ScreeningId $screeningId): array
     {
-        $interviewModels = \App\Interview::where('screening_id', $screeningId)->get();
+        $interviewModels = \App\Interview::where('screening_id', $screeningId->getValue())->get();
         $interviews = [];
 
         foreach ($interviewModels as $interviewModel) {
@@ -31,7 +40,7 @@ class InterviewEloquentRepository implements InterviewRepository
     public function insert(Interview $interview)
     {
         $interviewModel = new \App\Interview();
-        $interviewModel->screening_id = $interview->getScreeningId();
+        $interviewModel->screening_id = $interview->getScreeningId()->getValue();
         $interviewModel->screening_date = $interview->getScreeningDate();
         $interviewModel->interview_number = $interview->getInterviewNumber();
         $interviewModel->screening_step_result = $interview->getScreeningStepResult();
@@ -43,7 +52,7 @@ class InterviewEloquentRepository implements InterviewRepository
     {
         /** @var \App\Interview $interviewModel */
         $interviewModel = \App\Interview::find($interview->getInterviewId());
-        $interviewModel->screening_id = $interview->getScreeningId();
+        $interviewModel->screening_id = $interview->getScreeningId()->getValue();
         $interviewModel->screening_date = $interview->getScreeningDate();
         $interviewModel->interview_number = $interview->getInterviewNumber();
         $interviewModel->screening_step_result = $interview->getScreeningStepResult();

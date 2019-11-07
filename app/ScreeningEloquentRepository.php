@@ -4,25 +4,35 @@
 namespace App;
 
 use SampleDdd\Domain\Interviews;
+use SampleDdd\Domain\Repository\InterviewRepository;
 use SampleDdd\Domain\Repository\ScreeningRepository;
 use SampleDdd\Domain\Screening;
+use SampleDdd\Domain\ScreeningId;
 use SampleDdd\Domain\ScreeningStatus;
 
 class ScreeningEloquentRepository implements ScreeningRepository
 {
+    /** @var InterviewRepository */
+    private $interviewRepository;
+
+    public function __construct()
+    {
+        // InterviewRepository を DI
+        $this->interviewRepository = resolve('SampleDdd\Domain\Repository\InterviewRepository');
+    }
+
     /**
      * ID(PK)で取得
      *
-     * @param int $screeningId
+     * @param ScreeningId $screeningId
      * @return Screening
      * @throws \Exception
      */
-    public function findById(int $screeningId): Screening
+    public function findById(ScreeningId $screeningId): Screening
     {
-        $screeningModel = \App\Screening::find($screeningId);
+        $screeningModel = \App\Screening::find($screeningId->getValue());
 
-        $interviewRepository = resolve('SampleDdd\Domain\Repository\InterviewRepository');
-        $interviews = $interviewRepository->findByScreeningId($screeningId);
+        $interviews = $this->interviewRepository->findByScreeningId($screeningId);
 
         $screening = Screening::reconstruct(
             $screeningModel->id,
@@ -57,7 +67,7 @@ class ScreeningEloquentRepository implements ScreeningRepository
     public function update(Screening $screening)
     {
         /** @var \App\Screening $screeningModel */
-        $screeningModel = \App\Screening::find($screening->getId());
+        $screeningModel = \App\Screening::find($screening->getId()->getValue());
         $screeningModel->apply_date = $screening->getApplyDate();
         $screeningModel->status = $screening->getStatus();
         $screeningModel->applicant_email_address = $screening->getApplicantEmailAddress();
@@ -69,16 +79,16 @@ class ScreeningEloquentRepository implements ScreeningRepository
     /**
      * 選考に紐づいた面談・面接を保存
      *
-     * @param int $screeningId
+     * @param ScreeningId $screeningId
      * @param Interviews $interviews
      */
-    private function saveInterviews(int $screeningId, Interviews $interviews): void
+    private function saveInterviews(ScreeningId $screeningId, Interviews $interviews): void
     {
         // 面接・面談は減ることは無いので、増えるロジックのみ考える。
 
         $saveInterviews = [];
 
-        $interviewsInDb = \App\Interview::where('screening_id', $screeningId)->get();
+        $interviewsInDb = \App\Interview::where('screening_id', $screeningId->getValue())->get();
         $interviewsInEntity = $interviews->getValue();
         if ($interviewsInDb->count() != count($interviewsInEntity)) {
             // 全て新規追加対象とする
@@ -99,10 +109,8 @@ class ScreeningEloquentRepository implements ScreeningRepository
             return;
         }
 
-        $interviewRepository = resolve('SampleDdd\Domain\Repository\InterviewRepository');
-
         foreach ($saveInterviews as $saveInterview) {
-            $interviewRepository->insert($saveInterview);
+            $this->interviewRepository->insert($saveInterview);
         }
     }
 }

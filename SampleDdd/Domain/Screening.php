@@ -4,9 +4,9 @@ namespace SampleDdd\Domain;
 
 use Exception;
 
-class Screening
+class Screening extends EmailAddress
 {
-    /** @var integer 採用選考ID */
+    /** @var ScreeningId 採用選考ID */
     private $id;
 
     /** @var \DateTime 応募日 */
@@ -106,7 +106,7 @@ class Screening
     public static function reconstruct(int $screeningId, string $applicantEmailAddress, ScreeningStatus $status, ?\DateTime $applyDate, Interviews $interviews): self
     {
         $object = new Screening();
-        $object->id = $screeningId;
+        $object->id = ScreeningId::reconstruct($screeningId);
         $object->applicantEmailAddress = EmailAddress::reconstruct($applicantEmailAddress);
         $object->status = $status;
         $object->applyDate = $applyDate;
@@ -115,9 +115,9 @@ class Screening
     }
 
     /**
-     * @return int
+     * @return ScreeningId
      */
-    public function getId(): int
+    public function getId(): ScreeningId
     {
         return $this->id;
     }

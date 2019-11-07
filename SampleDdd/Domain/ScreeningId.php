@@ -23,7 +23,7 @@ class ScreeningId
      * @param int $screeningId
      * @return $this
      */
-    public function reconstruct(int $screeningId): self
+    public static function reconstruct(int $screeningId): self
     {
         return new self($screeningId);
     }

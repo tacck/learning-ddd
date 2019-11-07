@@ -7,7 +7,7 @@ class Interview
     /** @var integer 面接ID */
     private $interviewId;
 
-    /** @var integer 採用選考ID */
+    /** @var ScreeningId 採用選考ID */
     private $screeningId;
 
     /** @var \DateTime 選考日 */
@@ -32,12 +32,12 @@ class Interview
     /**
      * オブジェクト作成用ファクトリーメソッド
      *
-     * @param int $screeningId
+     * @param ScreeningId $screeningId
      * @param \DateTime $interviewDate
      * @param int $interviewNumber
      * @return Interview
      */
-    public static function create(int $screeningId, \DateTime $interviewDate, int $interviewNumber): Interview
+    public static function create(ScreeningId $screeningId, \DateTime $interviewDate, int $interviewNumber): Interview
     {
         $object = new Interview();
 
@@ -62,7 +62,7 @@ class Interview
      */
     public static function reconstruct(int $interviewId, int $screeningId, \DateTime $interviewDate, int $interviewNumber): self
     {
-        $object = self::create($screeningId, $interviewDate, $interviewNumber);
+        $object = self::create(ScreeningId::reconstruct($screeningId), $interviewDate, $interviewNumber);
         $object->interviewId = $interviewId;
         return $object;
     }
@@ -76,9 +76,9 @@ class Interview
     }
 
     /**
-     * @return int
+     * @return ScreeningId
      */
-    public function getScreeningId(): int
+    public function getScreeningId(): ScreeningId
     {
         return $this->screeningId;
     }

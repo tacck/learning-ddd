@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use SampleDdd\Domain\Repository\ScreeningRepository;
 use SampleDdd\Domain\Screening;
 use SampleDdd\Domain\EmailAddress;
+use SampleDdd\Domain\ScreeningId;
 
 class ScreeningApplicationService
 {
@@ -29,7 +30,7 @@ class ScreeningApplicationService
     public function startFromPreInterview(EmailAddress $applicantEmailAddress): void
     {
         DB::transaction(function () use ($applicantEmailAddress) {
-            /** @var \SampleDdd\Domain\Screening $screening */
+            /** @var Screening $screening */
             $screening = Screening::startFromPreInterview($applicantEmailAddress);
 
             $this->screeningRepository->insert($screening);
@@ -44,7 +45,7 @@ class ScreeningApplicationService
     public function apply(EmailAddress $applicantEmailAddress): void
     {
         DB::transaction(function () use ($applicantEmailAddress) {
-            /** @var \SampleDdd\Domain\Screening $screening */
+            /** @var Screening $screening */
             $screening = Screening::apply($applicantEmailAddress);
 
             $this->screeningRepository->insert($screening);
@@ -54,14 +55,14 @@ class ScreeningApplicationService
     /**
      * 次の面接を設定する
      *
-     * @param string $screeningId
+     * @param ScreeningId $screeningId
      * @param \DateTime $interviewDate
      */
-    public function addNextInterview(string $screeningId, \DateTime $interviewDate): void
+    public function addNextInterview(ScreeningId $screeningId, \DateTime $interviewDate): void
     {
         DB::transaction(function () use ($screeningId, $interviewDate) {
             // 永続化されたオブジェクトを「集約単位で」取得
-            /** @var \SampleDdd\Domain\Screening $screening */
+            /** @var Screening $screening */
             $screening = $this->screeningRepository->findById($screeningId);
 
             $screening->addNextInterview($interviewDate);
